@@ -8,32 +8,44 @@
 import SwiftUI
 
 struct ContentView: View {
-    @FetchRequest(sortDescriptors: []) var students: FetchedResults<Student>
+    @FetchRequest(sortDescriptors: []) var books: FetchedResults<Book>
     @Environment(\.managedObjectContext) var moc
+    @State private var showingAddScreen = false
 
-    @State private var rememberMe = false
-    @AppStorage("notes") private var notes = ""
+    
+//    @State private var rememberMe = false
+//    @AppStorage("notes") private var notes = ""
 
     var body: some View {
-        VStack {
-            List(students) { student in
-                Text(student.name ?? "Unknown")
+        NavigationView {
+            List(books) { book in
+                VStack {
+                    HStack {
+                        Text(book.title ?? "Unknown")
+                        Spacer()
+                        Text(book.author ?? "Unknown")
+                    }
+                    Spacer()
+                    HStack {
+                        Text(book.genre ?? "")
+                        Spacer()
+                        Text("\(book.rating)")
+                    }
+                }
             }
-            
-            Button("Add") {
-                let firstNames = ["Ginny", "Harry", "Hermione", "Luna", "Ron"]
-                let lastNames = ["Granger", "Lovegood", "Potter", "Weasley"]
-
-                let chosenFirstName = firstNames.randomElement()!
-                let chosenLastName = lastNames.randomElement()!
-
-                // more code to come
-                let student = Student(context: moc)
-                student.id = UUID()
-                student.name = "\(chosenFirstName) \(chosenLastName)"
-                
-                try? moc.save()
-            }
+                .navigationTitle("Bookworm")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            showingAddScreen.toggle()
+                        } label: {
+                            Label("Add Book", systemImage: "plus")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showingAddScreen) {
+                    AddBookView()
+                }
         }
     }
 }
