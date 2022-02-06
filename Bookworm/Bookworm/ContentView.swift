@@ -11,41 +11,41 @@ struct ContentView: View {
     @FetchRequest(sortDescriptors: []) var books: FetchedResults<Book>
     @Environment(\.managedObjectContext) var moc
     @State private var showingAddScreen = false
-
     
-//    @State private var rememberMe = false
-//    @AppStorage("notes") private var notes = ""
-
     var body: some View {
         NavigationView {
-            List(books) { book in
-                VStack {
-                    HStack {
-                        Text(book.title ?? "Unknown")
-                        Spacer()
-                        Text(book.author ?? "Unknown")
-                    }
-                    Spacer()
-                    HStack {
-                        Text(book.genre ?? "")
-                        Spacer()
-                        Text("\(book.rating)")
-                    }
-                }
-            }
-                .navigationTitle("Bookworm")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            showingAddScreen.toggle()
-                        } label: {
-                            Label("Add Book", systemImage: "plus")
+            List {
+                ForEach(books) { book in
+                    NavigationLink {
+                        Text(book.title ?? "Unknown Title")
+                    } label: {
+                        HStack {
+                            EmojiRatingView(rating: book.rating)
+                                .font(.largeTitle)
+
+                            VStack(alignment: .leading) {
+                                Text(book.title ?? "Unknown Title")
+                                    .font(.headline)
+                                Text(book.author ?? "Unknown Author")
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
                 }
-                .sheet(isPresented: $showingAddScreen) {
-                    AddBookView()
+            }
+            .navigationTitle("Bookworm")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingAddScreen.toggle()
+                    } label: {
+                        Label("Add Book", systemImage: "plus")
+                    }
                 }
+            }
+            .sheet(isPresented: $showingAddScreen) {
+                AddBookView()
+            }
         }
     }
 }
@@ -59,10 +59,10 @@ struct ContentView_Previews: PreviewProvider {
 struct PushButton: View {
     let title: String
     @Binding var isOn: Bool
-
+    
     var onColors = [Color.red, Color.yellow]
     var offColors = [Color(white: 0.6), Color(white: 0.4)]
-
+    
     var body: some View {
         Button(title) {
             isOn.toggle()
